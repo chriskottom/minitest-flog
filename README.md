@@ -1,8 +1,14 @@
-# Minitest::Flog
+# minitest-flog
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/minitest/flog`. To experiment with that code, run `bin/console` for an interactive prompt.
+Beat your code, see where it bleeds.
 
-TODO: Delete this and the text above, and describe your gem
+Flog analyzes Ruby code for signs of complexity and produces a numeric score
+for each method and class in every file it scans.  A higher score is indicative
+of more complex constructs and therefore refactoring opportunities.
+
+This gem integrates Flog directly into your project's test suite so that you're
+automatically alerted to any changes that 
+
 
 ## Installation
 
@@ -20,9 +26,36 @@ Or install it yourself as:
 
     $ gem install minitest-flog
 
+You'll need to require the library in your test helper:
+
+```ruby
+require "minitest/flog"
+```
+
 ## Usage
 
-TODO: Write usage instructions here
+minitest-flog introduces a new Minitest::Flog::Test class that you'll
+use to make any assertions about complexity in your project.
+
+Create a new test by subclassing Minitest::Flog::Test.  You can then make
+assertions about the Flog scoring you expect to calculate for code in selected
+directories in your project.  The example below has two assertions:
+
+* No method should have a score over 100.0.
+* 95% of all methods should have scores less than or equal to 40.0.
+
+```ruby
+class MyProjectFlogger < Minitest::Test
+  def flog_lib
+    assert_method_score("lib", score: 100.0)
+	assert_method_score("lib", score: 40.0, ratio: 0.95)
+  end
+end
+```
+
+## To-Dos
+
+TO-DO: list these TO-DOs
 
 ## Development
 
