@@ -1,3 +1,4 @@
+require 'stringio'
 require 'test_helper'
 
 class FlogTest < Minitest::Test
@@ -85,5 +86,51 @@ class FlogAssertionsTest < Minitest::Test
       msg = "Expected 50.0% of flogged methods to have score < 50.0 (actual: 33.3%)"
       assert_equal msg, failure.message
     end
+  end
+end
+
+class FlogReporterTest < Minitest::Test
+  def setup
+    @io = StringIO.new
+    @reporter = Minitest::Flog::Reporter.new(@io, flog: true )
+    @result = Minitest::Flog::Test.new("foo")
+  end
+
+  def test_record_failed_flog
+    @result.failures << "FAIL!"
+    @reporter.record @result
+    assert_includes @reporter.failed_flogs, @result
+  end
+
+  def test_record_successful_flog
+    @reporter.record @result
+    refute_includes @reporter.failed_flogs, @result
+  end
+
+  def test_record_non_flog
+    result = "Ceci n'est pas une result"
+    @reporter.record result
+    refute_includes @reporter.failed_flogs, result
+  end
+
+  def test_report_flog_option_off
+    @reporter = Minitest::Flog::Reporter.new(@io, flog: false)
+    @reporter.failed_flogs << @result
+    @reporter.report
+    assert_equal "", @io.string
+  end
+
+  def test_report_no_flog_failures
+    @reporter.report
+    assert_equal "", @io.string
+  end
+
+  def test_report_with_flog_failure
+    @result.stub(:detail_report, "\nREPORTING_DETAILS\n") do
+      @reporter.failed_flogs << @result
+      @reporter.report
+    end
+    expected = "\nFlog reporting\nREPORTING_DETAILS\n"
+    assert_equal expected, @io.string
   end
 end
