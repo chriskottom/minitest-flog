@@ -53,9 +53,13 @@ class MyProjectFlogger < Minitest::Test
 end
 ```
 
+Invoking your tests with the `-f` or `--flog` option will turn on extended
+Flog-like reporting in case of a failure.
+
 ## To-Dos
 
-TO-DO: list these TO-DOs
+* Implement Minitest::Spec compatibility
+* Threadsafe access to class variables
 
 ## Contributing
 
